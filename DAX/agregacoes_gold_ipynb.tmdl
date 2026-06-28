@@ -1,0 +1,410 @@
+table agregacoes_gold_ipynb
+	lineageTag: 6e3c3aea-9afb-4c5e-a842-77a7a8c38d81
+
+	measure 'Total Pontos' = SUM('agregacoes_gold_ipynb'[total_pontos])
+		formatString: 0
+		lineageTag: edf11c52-20fe-407b-a3a8-03c16584b559
+
+	measure 'Total Vitorias' = SUM('agregacoes_gold_ipynb'[vitorias])
+		formatString: 0
+		lineageTag: 0934aec5-08c7-4c0c-a1d6-89f6d92206b3
+
+	measure 'Total Corridas' =
+			
+			MAXX(
+			    VALUES('agregacoes_gold_ipynb'[piloto]),
+			    CALCULATE(MAX('agregacoes_gold_ipynb'[corridas_disputadas]))
+			)
+		formatString: 0
+		lineageTag: faf73ee1-9631-45e5-8d1f-38c59af8781c
+
+	measure 'Pct Conclusao Media' =
+			
+			AVERAGEX(
+			    FILTER(
+			        SUMMARIZE(
+			            'agregacoes_gold_ipynb',
+			            'agregacoes_gold_ipynb'[piloto],
+			            'agregacoes_gold_ipynb'[ano],
+			            "pct", MAXX(
+			                FILTER(
+			                    'agregacoes_gold_ipynb',
+			                    'agregacoes_gold_ipynb'[piloto] = EARLIER('agregacoes_gold_ipynb'[piloto]) &&
+			                    'agregacoes_gold_ipynb'[ano] = EARLIER('agregacoes_gold_ipynb'[ano])
+			                ),
+			                'agregacoes_gold_ipynb'[pct_conclusao]
+			            )
+			        ),
+			        [pct] > 0
+			    ),
+			    [pct]
+			)
+		formatString: 0
+		lineageTag: a14c4ad2-00ed-451e-b621-28a974ead935
+
+	measure 'Pts por Corrida' = DIVIDE(SUM('agregacoes_gold_ipynb'[total_pontos]), MAX('agregacoes_gold_ipynb'[corridas_disputadas]))
+		lineageTag: 09e8c08c-33b4-4b39-a260-0bf4ad650896
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Lider = ```
+			
+			VAR TabelaFiltrada = 
+			    ADDCOLUMNS(
+			        VALUES('agregacoes_gold_ipynb'[piloto]),
+			        "pts", CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    )
+			VAR MaxPts = MAXX(TabelaFiltrada, [pts])
+			RETURN
+			    MAXX(
+			        FILTER(TabelaFiltrada, [pts] = MaxPts),
+			        'agregacoes_gold_ipynb'[piloto]
+			    )
+			```
+		lineageTag: ce67be41-a7c7-47ae-903d-91bc99c5c79d
+
+	measure 'Pontos Lider' =
+			
+			MAXX(
+			    VALUES('agregacoes_gold_ipynb'[piloto]),
+			    CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			)
+		formatString: 0
+		lineageTag: cbf2b10c-4c98-415b-a9c5-0c8cd8a3cfe8
+
+	measure 'Equipe Lider' = ```
+			
+			VAR MaxPontos = 
+			    MAXX(
+			        VALUES('agregacoes_gold_ipynb'[Equipe]),
+			        CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    )
+			RETURN
+			    MAXX(
+			        FILTER(
+			            VALUES('agregacoes_gold_ipynb'[Equipe]),
+			            CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos])) = MaxPontos
+			        ),
+			        'agregacoes_gold_ipynb'[Equipe]
+			    )
+			```
+		lineageTag: 3ec8b4fe-35db-472a-972e-f9a3c1f6d450
+
+	measure 'Pontos Equipe' =
+			
+			MAXX(
+			    VALUES('agregacoes_gold_ipynb'[Equipe]),
+			    CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			)
+		formatString: 0
+		lineageTag: 7221b4c6-bdfc-468f-a291-152b7f620f18
+
+	measure 'Total Vitorias Equipe' =
+			
+			SUMX(
+			    SUMMARIZE(
+			        'agregacoes_gold_ipynb',
+			        'agregacoes_gold_ipynb'[Equipe],
+			        'agregacoes_gold_ipynb'[ano],
+			        "vit", MAX('agregacoes_gold_ipynb'[vitorias])
+			    ),
+			    [vit]
+			)
+		formatString: 0
+		lineageTag: 8b41b4dd-ea6a-4009-a32f-dbb728743bb4
+
+	measure 'Total Corridas Equipe' =
+			
+			MAXX(
+			    FILTER(
+			        'agregacoes_gold_ipynb',
+			        'agregacoes_gold_ipynb'[posicao_campeonato] = 1
+			    ),
+			    'agregacoes_gold_ipynb'[corridas_disputadas]
+			)
+		formatString: 0
+		lineageTag: f13d51bf-f29c-4c96-bbbf-164309560406
+
+	measure 'Total Sprint Equipe' =
+			
+			SUMX(
+			    SUMMARIZE(
+			        'agregacoes_gold_ipynb',
+			        'agregacoes_gold_ipynb'[Equipe],
+			        'agregacoes_gold_ipynb'[ano],
+			        "spr", MAX('agregacoes_gold_ipynb'[vitorias_sprint])
+			    ),
+			    [spr]
+			)
+		formatString: 0
+		lineageTag: 0b6d1bd3-b192-4b77-8c9f-22877a99a983
+
+	measure 'Corridas Disputadas Equipe' =
+			
+			MAXX(
+			    SUMMARIZE(
+			        'agregacoes_gold_ipynb',
+			        'agregacoes_gold_ipynb'[Equipe],
+			        'agregacoes_gold_ipynb'[ano],
+			        "corr", MAX('agregacoes_gold_ipynb'[corridas_disputadas])
+			    ),
+			    [corr]
+			)
+		formatString: 0
+		lineageTag: 8da390b9-4640-4c12-bec8-a40760911d21
+
+	measure 'Lider 2025' =
+			
+			CALCULATE(
+			    VAR MaxPts = MAXX(
+			        VALUES('agregacoes_gold_ipynb'[piloto]),
+			        CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    )
+			    RETURN
+			    MAXX(
+			        FILTER(
+			            VALUES('agregacoes_gold_ipynb'[piloto]),
+			            CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos])) = MaxPts
+			        ),
+			        'agregacoes_gold_ipynb'[piloto]
+			    ),
+			    'agregacoes_gold_ipynb'[ano] = 2025
+			)
+		lineageTag: 5f3b30da-2ab9-492c-95f7-0fdaa2fe3d2a
+
+	measure 'Pontos Lider 2025' =
+			
+			CALCULATE(
+			    MAXX(
+			        VALUES('agregacoes_gold_ipynb'[piloto]),
+			        CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    ),
+			    'agregacoes_gold_ipynb'[ano] = 2025
+			)
+		formatString: 0
+		lineageTag: eac0b479-ea23-43d7-a95e-326153a712f5
+
+	measure 'Lider 2026' =
+			
+			CALCULATE(
+			    VAR MaxPts = MAXX(
+			        VALUES('agregacoes_gold_ipynb'[piloto]),
+			        CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    )
+			    RETURN
+			    MAXX(
+			        FILTER(
+			            VALUES('agregacoes_gold_ipynb'[piloto]),
+			            CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos])) = MaxPts
+			        ),
+			        'agregacoes_gold_ipynb'[piloto]
+			    ),
+			    'agregacoes_gold_ipynb'[ano] = 2026
+			)
+		lineageTag: 7f72fd8d-4dd3-4367-831a-4262b38386c4
+
+	measure 'Pontos Lider 2026' =
+			
+			CALCULATE(
+			    MAXX(
+			        VALUES('agregacoes_gold_ipynb'[piloto]),
+			        CALCULATE(SUM('agregacoes_gold_ipynb'[total_pontos]))
+			    ),
+			    'agregacoes_gold_ipynb'[ano] = 2026
+			)
+		formatString: 0
+		lineageTag: 1d4349e4-727f-4d80-b428-3522125e46c0
+
+	measure 'Mudanca Posicao' = ```
+			
+			VAR Pos2025 = 
+			    CALCULATE(
+			        MIN('agregacoes_gold_ipynb'[posicao_campeonato]),
+			        'agregacoes_gold_ipynb'[ano] = 2025
+			    )
+			VAR Pos2026 = 
+			    CALCULATE(
+			        MIN('agregacoes_gold_ipynb'[posicao_campeonato]),
+			        'agregacoes_gold_ipynb'[ano] = 2026
+			    )
+			RETURN
+			    Pos2025 - Pos2026
+			```
+		formatString: 0
+		lineageTag: cb0b7481-8e0d-4faa-9edc-a767b22436cc
+
+	measure 'Posicao 2025' =
+			
+			CALCULATE(
+			    MIN('agregacoes_gold_ipynb'[posicao_campeonato]),
+			    'agregacoes_gold_ipynb'[ano] = 2025
+			)
+		formatString: 0
+		lineageTag: 979d21a2-5eb1-4ce9-abd3-be876412bca2
+
+	measure 'Posicao 2026' =
+			
+			CALCULATE(
+			    MIN('agregacoes_gold_ipynb'[posicao_campeonato]),
+			    'agregacoes_gold_ipynb'[ano] = 2026
+			)
+		formatString: 0
+		lineageTag: ee7f613e-3896-452f-ac2d-7c9101551351
+
+	column ano
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e6d3564-79f8-4ea9-811a-b209623518ac
+		summarizeBy: sum
+		sourceColumn: ano
+
+		annotation SummarizationSetBy = Automatic
+
+	column piloto
+		dataType: string
+		lineageTag: 0b6158c9-548e-443e-8431-03570b1cca0f
+		summarizeBy: none
+		sourceColumn: piloto
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_piloto
+		dataType: string
+		lineageTag: 0e24d800-a5ba-4768-8759-9f1af1fd7fc4
+		summarizeBy: none
+		sourceColumn: codigo_piloto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Equipe
+		dataType: string
+		lineageTag: 04889c82-5fa6-44dc-8930-dcebfcf8953a
+		summarizeBy: none
+		sourceColumn: Equipe
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_pontos
+		dataType: int64
+		formatString: 0
+		lineageTag: a7decda7-ec92-4d96-a29c-ebce88b3911b
+		summarizeBy: sum
+		sourceColumn: total_pontos
+
+		annotation SummarizationSetBy = Automatic
+
+	column pontos_corridas
+		dataType: int64
+		formatString: 0
+		lineageTag: bc5a9bf7-6e0b-414f-8d7e-0979aa850abb
+		summarizeBy: sum
+		sourceColumn: pontos_corridas
+
+		annotation SummarizationSetBy = Automatic
+
+	column corridas_disputadas
+		dataType: int64
+		formatString: 0
+		lineageTag: bd532091-ca43-4eff-89f9-23626ba5bd39
+		summarizeBy: sum
+		sourceColumn: corridas_disputadas
+
+		annotation SummarizationSetBy = Automatic
+
+	column vitorias
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c621b02-ba47-4ed1-ac34-a69023143470
+		summarizeBy: sum
+		sourceColumn: vitorias
+
+		annotation SummarizationSetBy = Automatic
+
+	column podios
+		dataType: int64
+		formatString: 0
+		lineageTag: f18c7486-609d-4efe-a24c-ea4514305efe
+		summarizeBy: sum
+		sourceColumn: podios
+
+		annotation SummarizationSetBy = Automatic
+
+	column poles
+		dataType: int64
+		formatString: 0
+		lineageTag: f721a8a6-b494-4013-b132-7fc59209ae1f
+		summarizeBy: sum
+		sourceColumn: poles
+
+		annotation SummarizationSetBy = Automatic
+
+	column corridas_concluidas
+		dataType: int64
+		formatString: 0
+		lineageTag: 95fec73d-6d97-43f9-9c23-5f0995fec014
+		summarizeBy: sum
+		sourceColumn: corridas_concluidas
+
+		annotation SummarizationSetBy = Automatic
+
+	column vitorias_sprint
+		dataType: int64
+		formatString: 0
+		lineageTag: 7b0a946a-17e5-40e2-9fa2-4b08a81b4319
+		summarizeBy: sum
+		sourceColumn: vitorias_sprint
+
+		annotation SummarizationSetBy = Automatic
+
+	column posicao_campeonato
+		dataType: int64
+		formatString: 0
+		lineageTag: d5637493-cae9-4011-9197-aa08552db2a9
+		summarizeBy: sum
+		sourceColumn: posicao_campeonato
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_conclusao
+		dataType: int64
+		formatString: 0
+		lineageTag: 859abc07-98b1-4090-87ee-f68e500cac1c
+		summarizeBy: sum
+		sourceColumn: pct_conclusao
+
+		annotation SummarizationSetBy = Automatic
+
+	column COR_EQUIPE
+		dataType: string
+		lineageTag: 6bcd7fba-2910-4a76-88f8-16e53c8d2064
+		summarizeBy: none
+		sourceColumn: COR_EQUIPE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition agregacoes_gold_ipynb = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("C:\Users\vinicius\Downloads\agregacoes_gold_ipynb.csv"),[Delimiter=",", Columns=14, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"ano", Int64.Type}, {"piloto", type text}, {"codigo_piloto", type text}, {"construtor", type text}, {"total_pontos", Int64.Type}, {"pontos_corridas", Int64.Type}, {"corridas_disputadas", Int64.Type}, {"vitorias", Int64.Type}, {"podios", Int64.Type}, {"poles", Int64.Type}, {"corridas_concluidas", Int64.Type}, {"vitorias_sprint", Int64.Type}, {"posicao_campeonato", Int64.Type}, {"pct_conclusao", Int64.Type}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado", "COR_EQUIPE", each if [construtor] = "McLaren" then "#FF8000"
+				else if [construtor] = "Red Bull" then "#3671C6"
+				else if [construtor] = "Ferrari" then "#E8002D"
+				else if [construtor] = "Mercedes" then "#00D2BE"
+				else if [construtor] = "Williams" then "#64C4FF"
+				else if [construtor] = "Aston Martin" then "#229971"
+				else if [construtor] = "Alpine F1 Team" then "#FF87BC"
+				else if [construtor] = "RB F1 Team" then "#6692FF"
+				else if [construtor] = "Haas F1 Team" then "#B6BABD"
+				else if [construtor] = "Sauber" then "#52E252"
+				else "#888888"),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Personalização Adicionada",{{"construtor", "Equipe"}})
+				in
+				    #"Colunas Renomeadas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
