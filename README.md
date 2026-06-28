@@ -3,9 +3,9 @@
 Dashboard interativo de Fórmula 1 cobrindo as temporadas 2025 e 2026, construído sobre arquitetura Delta Lake no Databricks.
 
 ## 📸 Preview
-![Pilotos](images/pilotos.png)
-![Equipes](images/equipes.png)
-![Comparativo](images/comparativo.png)
+![Pilotos]([images/pilotos.png](https://github.com/euovinicius/F1-dashboard-power-bi/blob/main/imagens/Pilotos.png))
+![Equipes]([images/equipes.png](https://github.com/euovinicius/F1-dashboard-power-bi/blob/main/imagens/Equipes.png))
+![Comparativo]([images/comparativo.png](https://github.com/euovinicius/F1-dashboard-power-bi/blob/main/imagens/Comparativos.png))
 
 ## 🎯 O que o projeto faz
 - Consolida dados de corridas, pilotos e construtores F1.
